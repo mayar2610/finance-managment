@@ -28,12 +28,14 @@ class Group(models.Model):
 class Membership(models.Model):
 	group = models.ForeignKey('Group', on_delete=models.CASCADE)
 	user = models.ForeignKey('User', on_delete=models.CASCADE)
-	bank = models.ForeignKey('Card', on_delete=models.SET_NULL, blank=True, null=True)
+	is_admin = models.BooleanField()
+	card = models.ForeignKey('Card', on_delete=models.PROTECT, blank=True, null=True)
 
 
 class Card(models.Model):
 	card_id = models.BigIntegerField(unique=True)
 	total = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'))
+	active = models.BooleanField(default=True)
 	user = models.ForeignKey('User', on_delete=models.CASCADE)
 
 	def __str__(self):
@@ -46,10 +48,11 @@ class Operation(models.Model):
 	group_operation = models.BooleanField()
 	date = models.DateTimeField(default=timezone.now)
 	category = models.ForeignKey('Category', on_delete=models.SET_NULL, blank=True, null=True)
+	card = models.ForeignKey('Card', on_delete=models.PROTECT, blank=True, null=True)
 
 
 class Category(models.Model):
-	name = models.CharField(max_length=200)
+	name = models.CharField(max_length=200, blank=True)
 
 	def __str__(self):
 		return self.name
